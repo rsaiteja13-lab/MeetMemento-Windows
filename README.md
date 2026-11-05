@@ -55,6 +55,10 @@ Before distributing a production build, complete one live Windows check in both 
 3. Share and stop sharing a screen, then leave the meeting after at least 10 minutes.
 4. Confirm that the saved video has the full duration and audible computer output, the separate microphone track contains your voice, the transcript opens, and every available file can be downloaded.
 
+## Cross-platform maintenance
+
+MeetMemento's macOS and Windows editions are maintained as a pair. Every fix to shared meeting detection, recording, audio, video, transcription, recovery, export, background operation, permissions, or library behavior must be checked against both repositories. When the same problem applies to both platforms, both implementations, test suites, and releases should be updated together; platform-specific exceptions should be documented in the release notes.
+
 ## Current scope
 
 The Windows MVP supports Windows 10 and Windows 11. It intentionally does not create summaries or upload media. No universal Windows event identifies calls in every arbitrary application, so automatic detection requires a recognized provider or a strong live-call window title; **Record meeting now** remains the fallback for ambiguous apps. Calendar-based titles, cloud sync, signing, and automatic updates are future work.
