@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.cache/
+.pnpm-store/
+.DS_Store
+npm-debug.log*
+
+# Runtime recordings and user data never belong in source control.
+Recordings/
+*.mp3
+*.m4a
+*.wav
+*.mp4
+*.mov
+*.webm
+*.mkv
+transcript.txt
+settings.json
+app-diagnostics*.log
