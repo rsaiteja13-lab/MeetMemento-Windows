@@ -6,6 +6,7 @@ on:
   pull_request:
   release:
     types: [published]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -50,7 +51,7 @@ jobs:
           if-no-files-found: error
 
   publish-release-assets:
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
     needs: verify-windows
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -63,7 +64,26 @@ jobs:
           name: MeetMemento-Windows-0.10.1
           path: release-assets
 
+      - name: Select release tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "RELEASE_TAG=${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
+          else
+            echo "RELEASE_TAG=v0.10.1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Create verified Windows release
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$RELEASE_TAG" >/dev/null 2>&1 || gh release create "$RELEASE_TAG" \
+            --target main \
+            --title "MeetMemento for Windows 0.10.1" \
+            --notes "Verified x64 and ARM64 installers and portable packages. Includes reliable full-length video, clean system-audio playback, separate echo-reduced microphone capture, broader meeting detection, recovery safeguards, and multi-select deletion. Recordings and personal data are never included. These development packages are not Authenticode-signed, so Windows SmartScreen may show a warning."
+
       - name: Attach Windows packages to release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" release-assets/* --clobber
+        run: gh release upload "$RELEASE_TAG" release-assets/* --clobber
