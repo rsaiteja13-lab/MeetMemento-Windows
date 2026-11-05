@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  release:
+    types: [published]
 
 permissions:
   contents: read
@@ -46,3 +48,22 @@ jobs:
             dist/MeetMemento-Windows-0.10.1-*.exe
             dist/MeetMemento-Windows-0.10.1-*.zip
           if-no-files-found: error
+
+  publish-release-assets:
+    if: github.event_name == 'release'
+    needs: verify-windows
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download verified Windows packages
+        uses: actions/download-artifact@v4
+        with:
+          name: MeetMemento-Windows-0.10.1
+          path: release-assets
+
+      - name: Attach Windows packages to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" release-assets/* --clobber
